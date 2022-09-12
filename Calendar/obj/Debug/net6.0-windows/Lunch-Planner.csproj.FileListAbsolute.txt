@@ -1,0 +1,1 @@
+C:\Allgemein\Iskola\Lunch-Planner\Calendar\obj\Debug\net6.0-windows\Lunch-Planner.csproj.AssemblyReference.cache
