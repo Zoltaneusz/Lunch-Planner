@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Permissions;
 using System.Windows;
@@ -18,11 +19,15 @@ namespace Calendar
         // Create Dataset
         DataSet ds = new DataSet();
         Grid mainGrid;
+        ListView studentListCtrl;
+        System.Windows.Controls.Calendar calCtrl;
+        
 
         public class Student
         {
             public string name;
             public double payed;
+            public DateTime payDate;
             List<DateTime> breakList = new List<DateTime>();
 
             /// <summary>
@@ -31,10 +36,11 @@ namespace Calendar
             /// <param name="name">Full name of student.</param>
             /// <param name="payed">Payed sum in HUF.</param>
             /// <param name="breakList">List of days not eating.</param>
-            public Student(string name, double payed, List<DateTime> breakList)
+            public Student(string name, double payed, DateTime payDate, List<DateTime> breakList)
             {
                 this.name = name;
                 this.payed = payed;
+                this.payDate = payDate;
                 this.breakList = breakList;
             }
 
@@ -52,17 +58,33 @@ namespace Calendar
             {
                 return this.breakList;
             }
+
+            public void SetBreakList(List<DateTime> breakList)
+            {
+                this.breakList = breakList;
+            }
+            public double GetPayedAmount()
+            {
+                return this.payed;
+            }
+
+            public DateTime GetPayDate()
+            {
+                return this.payDate;
+            }
         }
 
         public class DataSet
         {
             List<Student> studentList = new List<Student>();
             List<DateTime> holidayList = new List<DateTime>();
+            double mealPrice;
 
-            public DataSet(List<Student> studentList, List<DateTime> holidayList)
+            public DataSet(List<Student> studentList, List<DateTime> holidayList, double mealPrice)
             {
                 this.studentList = studentList;
                 this.holidayList = holidayList;
+                this.mealPrice = mealPrice; 
             }
 
             public DataSet()
@@ -87,9 +109,9 @@ namespace Calendar
             /// <param name="name">Full name of the student.</param>
             /// <param name="payed">Payed sum in HUF.</param>
             /// <param name="breaks">List of days not eating.</param>
-            public void AddStudent(string name, double payed, List<DateTime> breaks)
+            public void AddStudent(string name, double payed, DateTime payDate, List<DateTime> breaks)
             {
-                this.studentList.Add(new Student(name, payed, breaks));
+                this.studentList.Add(new Student(name, payed, payDate, breaks));
             }
 
             public void RemoveStudent(string name)
@@ -113,6 +135,25 @@ namespace Calendar
             public List<Student>? GetStudents()
             {
                 return this.studentList;
+            }
+
+            public void SetStudentBreaks(string name, List<DateTime> breakList)
+            {
+                Student? foundStudent = this.studentList.Find(x => (x.name.Equals(name)));
+                if (foundStudent != null)
+                {
+                    foundStudent.SetBreakList(breakList);
+                }
+            }
+
+            public void SetMealPrice(double price)
+            {
+                this.mealPrice = price;
+            }
+
+            public double GetMealPrice()
+            {
+                return this.mealPrice;
             }
         }
 
@@ -186,20 +227,25 @@ namespace Calendar
 
         private void Calendar_Loaded(object sender, RoutedEventArgs e)
         {
-            
-            System.Windows.Controls.Calendar cal = (System.Windows.Controls.Calendar) sender;
-            mainGrid = (Grid)cal.Parent;
+            // Save references to most used controls.
+            calCtrl = (System.Windows.Controls.Calendar) sender;
+            mainGrid = (Grid)calCtrl.Parent;
+            studentListCtrl = (ListView)mainGrid.Children[3];
+
+
+
             //SelectedDatesCollection selectedDates = cal.SelectedDates;
             //cal.SelectedDates.Add(new DateTime(2022, 09, 16));
-            cal.SelectionMode = CalendarSelectionMode.MultipleRange;
+            calCtrl.SelectionMode = CalendarSelectionMode.MultipleRange;
             //cal.SelectedDates.AddRange(new DateTime(2022, 09, 5), new DateTime(2022, 09, 22));
             
             // Fill Dataset
             
-            ds.AddStudent("Petike", 15000, new List<DateTime> { new DateTime(2022, 09, 13), new DateTime(2022, 09, 18), new DateTime(2022, 09, 19) });
-            ds.AddStudent("Janika", 15000, new List<DateTime> { new DateTime(2022, 09, 01), new DateTime(2022, 09, 02), new DateTime(2022, 09, 03) });
-            ds.AddStudent("Józsika", 15000, new List<DateTime> { new DateTime(2022, 09, 10), new DateTime(2022, 09, 11), new DateTime(2022, 09, 14) });
-            ds.AddStudent("Gerzsonka", 15000, new List<DateTime> { new DateTime(2022, 09, 20), new DateTime(2022, 09, 21), new DateTime(2022, 09, 30) });
+            ds.AddStudent("Petike", 15000, new DateTime(2022,09,01), new List<DateTime> { new DateTime(2022, 09, 13), new DateTime(2022, 09, 18), new DateTime(2022, 09, 19) });
+            ds.AddStudent("Janika", 3000, new DateTime(2022, 09, 02), new List<DateTime> { new DateTime(2022, 09, 01), new DateTime(2022, 09, 02), new DateTime(2022, 09, 03) });
+            ds.AddStudent("Józsika", 9000, new DateTime(2022, 09, 03), new List<DateTime> { new DateTime(2022, 09, 10), new DateTime(2022, 09, 11), new DateTime(2022, 09, 14) });
+            ds.AddStudent("Gerzsonka", 7777, new DateTime(2022, 09, 04), new List<DateTime> { new DateTime(2022, 09, 20), new DateTime(2022, 09, 21), new DateTime(2022, 09, 30) });
+            ds.SetMealPrice(1500);
             //ds.RemoveStudent("Petike");
 
 
@@ -218,36 +264,68 @@ namespace Calendar
             
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            Button buttonShowCal = (Button)sender;
-            //Grid mainGrid = (Grid) buttonShowCal.Parent;
-            System.Windows.Controls.Calendar cal = (System.Windows.Controls.Calendar)mainGrid.Children[0];
-            TextBox inputNameCtrl = (TextBox)mainGrid.Children[2];
-            cal.SelectedDates.Clear();
-            ListView studentListCtrl = (ListView)mainGrid.Children[3];
-            
-
-            foreach (DateTime breakDay in ds.GetStudent(studentListCtrl.SelectedItem.ToString()).GetDateTimes())
-            {
-                cal.SelectedDates.Add(breakDay);
-            }
-
-            
-
-
-
-        }
-
+    
         private void ListView_Loaded(object sender, RoutedEventArgs e)
         {
-            ListView studentListCtrl = (ListView)sender;
+            //ListView studentListCtrl = (ListView)sender;
             
             foreach (Student student in ds.GetStudents())
             {
                 studentListCtrl.Items.Add(student.name);
             }
             
+        }
+
+        private void breakSelectCtrl_Click(object sender, RoutedEventArgs e)
+        {
+            calCtrl.SelectedDates.Clear();
+            // TODO: Clear ListView selection .
+        }
+
+        private void doneCtrl_Click(object sender, RoutedEventArgs e)
+        {
+            SelectedDatesCollection breakList = (SelectedDatesCollection) calCtrl.SelectedDates;
+            List<DateTime> breaks = breakList.ToList();
+
+            var studentName = studentListCtrl.SelectedItem;
+            if(studentName != null)
+            {
+                ds.SetStudentBreaks(studentName.ToString(), breaks);
+            }
+            
+        }
+
+        private void showBreaksCtrl_Click(object sender, RoutedEventArgs e)
+        {
+            Button buttonShowCal = (Button)sender;
+            //Grid mainGrid = (Grid) buttonShowCal.Parent;
+
+            TextBox inputNameCtrl = (TextBox)mainGrid.Children[2];
+            calCtrl.SelectedDates.Clear();
+
+
+            foreach (DateTime breakDay in ds.GetStudent(studentListCtrl.SelectedItem.ToString()).GetDateTimes())
+            {
+                calCtrl.SelectedDates.Add(breakDay);
+            }
+
+
+        }
+
+        private void showPayedDaysCtrl_Click(object sender, RoutedEventArgs e)
+        {
+
+            //TODO: skip weekends and break days
+            calCtrl.SelectedDates.Clear();
+            double payedAmount = ds.GetStudent(studentListCtrl.SelectedItem.ToString()).GetPayedAmount();
+            int remainingDays = (int) Math.Floor(payedAmount / ds.GetMealPrice());
+
+            DateTime payDate = ds.GetStudent(studentListCtrl.SelectedItem.ToString()).GetPayDate();
+            DateTime endDate = payDate.AddDays(remainingDays-1);
+            
+
+            calCtrl.SelectedDates.AddRange(payDate, endDate);
+
         }
     }
 
