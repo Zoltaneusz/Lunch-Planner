@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Allgemein\\Iskola\\Lunch-Planner\\Calendar\\LunchPlanner.csproj": {}
+    "C:\\Allgemein\\Iskola\\Calendar\\Lunch-Planner\\Calendar\\LunchPlanner.csproj": {}
   },
   "projects": {
-    "C:\\Allgemein\\Iskola\\Lunch-Planner\\Calendar\\LunchPlanner.csproj": {
+    "C:\\Allgemein\\Iskola\\Calendar\\Lunch-Planner\\Calendar\\LunchPlanner.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Allgemein\\Iskola\\Lunch-Planner\\Calendar\\LunchPlanner.csproj",
+        "projectUniqueName": "C:\\Allgemein\\Iskola\\Calendar\\Lunch-Planner\\Calendar\\LunchPlanner.csproj",
         "projectName": "LunchPlanner",
-        "projectPath": "C:\\Allgemein\\Iskola\\Lunch-Planner\\Calendar\\LunchPlanner.csproj",
+        "projectPath": "C:\\Allgemein\\Iskola\\Calendar\\Lunch-Planner\\Calendar\\LunchPlanner.csproj",
         "packagesPath": "C:\\Users\\fuszenecker\\.nuget\\packages\\",
-        "outputPath": "C:\\Allgemein\\Iskola\\Lunch-Planner\\Calendar\\obj\\",
+        "outputPath": "C:\\Allgemein\\Iskola\\Calendar\\Lunch-Planner\\Calendar\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",

@@ -15,6 +15,9 @@ namespace Calendar
     /// </summary>
     public partial class MainWindow : Window
     {
+        // Create Dataset
+        DataSet ds = new DataSet();
+
         public class Student
         {
             public string name;
@@ -42,6 +45,11 @@ namespace Calendar
             public void RemoveBreakDay(DateTime breakDay)
             {
                 this.breakList.Remove(breakDay);
+            }
+
+            public List<DateTime>? GetDateTimes()
+            {
+                return this.breakList;
             }
         }
 
@@ -94,6 +102,12 @@ namespace Calendar
                 {
                     Debug.WriteLine("Student not found.");
                 }
+            }
+
+            public Student? GetStudent(string name)
+            {
+                Student? foundStudent = this.studentList.Find(x => (x.name.Equals(name)));
+                return foundStudent;
             }
         }
 
@@ -172,12 +186,12 @@ namespace Calendar
             //SelectedDatesCollection selectedDates = cal.SelectedDates;
             //cal.SelectedDates.Add(new DateTime(2022, 09, 16));
             cal.SelectionMode = CalendarSelectionMode.MultipleRange;
-            cal.SelectedDates.AddRange(new DateTime(2022, 09, 5), new DateTime(2022, 09, 22));
+            //cal.SelectedDates.AddRange(new DateTime(2022, 09, 5), new DateTime(2022, 09, 22));
             
-            // Create Dataset
-            DataSet ds = new DataSet();
+            // Fill Dataset
+            
             ds.AddStudent("Petike", 15000, new List<DateTime> { new DateTime(2022, 09, 13), new DateTime(2022, 09, 18), new DateTime(2022, 09, 19) });
-            ds.RemoveStudent("Petike");
+            //ds.RemoveStudent("Petike");
 
 
 
@@ -193,6 +207,25 @@ namespace Calendar
             //selectedDates.Insert(new DateTime(2022, 09, 15));
             //testDay.SetValue(SelectedDatesCollection)
             
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Button buttonShowCal = (Button)sender;
+            Grid mainGrid = (Grid) buttonShowCal.Parent;
+            System.Windows.Controls.Calendar cal = (System.Windows.Controls.Calendar)mainGrid.Children[0];
+            TextBox inputName = (TextBox)mainGrid.Children[2];
+            cal.SelectedDates.Clear();
+
+            foreach (DateTime breakDay in ds.GetStudent(inputName.Text).GetDateTimes())
+            {
+                cal.SelectedDates.Add(breakDay);
+            }
+
+            
+
+
+
         }
     }
 
