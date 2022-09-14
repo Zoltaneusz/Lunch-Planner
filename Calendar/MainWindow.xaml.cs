@@ -382,6 +382,7 @@ namespace Calendar
             DateTime payDate = ds.GetStudent(studentName.ToString()).GetPayDate();
             DateTime endDate = payDate.AddDays(remainingDays-1);
 
+            /*
             // Skipping breakdays
             DateTime startDate = payDate;
             foreach (DateTime breakDay in ds.GetStudent(studentName.ToString()).GetDateTimes())
@@ -397,10 +398,37 @@ namespace Calendar
                 
             }
             calCtrl.SelectedDates.AddRange(startDate, endDate);
-
-
+            */
             //calCtrl.SelectedDates.AddRange(payDate, endDate);
 
+            // New method
+            // List breakDays
+            // TODO: szombati munkanapok speckó kezelése
+            List<DateTime> breakDayList = new List<DateTime>();
+            foreach (DateTime breakDay in ds.GetStudent(studentName.ToString()).GetDateTimes())
+            {
+                breakDayList.Add(breakDay);
+
+            }
+            for(int i=0; i<remainingDays; i++)
+            {
+                DateTime dayToHighlight = new DateTime(payDate.Year, payDate.Month, payDate.Day + i);
+                if(dayToHighlight.DayOfWeek == DayOfWeek.Sunday || dayToHighlight.DayOfWeek == DayOfWeek.Saturday) // Skip weekends
+                {
+                    remainingDays++;
+                }
+                else
+                {
+                    if (breakDayList.Find(x => x.Date.Equals(dayToHighlight.Date)) != new DateTime()) // Skip breakdays
+                    {
+                        remainingDays++;
+                        CalendarDateRange calBlackoutRange = new CalendarDateRange(dayToHighlight, dayToHighlight);
+                        calCtrl.BlackoutDates.Add(calBlackoutRange);
+                    }
+                    else calCtrl.SelectedDates.Add(dayToHighlight); // Highlight normal payed day
+                    
+                }
+            }
 
 
         }
