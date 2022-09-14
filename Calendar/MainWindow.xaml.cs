@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Permissions;
@@ -339,13 +340,22 @@ namespace Calendar
 
             TextBox inputNameCtrl = (TextBox)mainGrid.Children[2];
             calCtrl.SelectedDates.Clear();
+            
+  
+            
 
             if(studentListCtrl.SelectedItem != null)
             {
+                calCtrl.CalendarDayButtonStyle = (Style)Resources["AlternativeCalendarDayButtonStyle"];
                 foreach (DateTime breakDay in ds.GetStudent(studentListCtrl.SelectedItem.ToString()).GetDateTimes())
                 {
                     calCtrl.SelectedDates.Add(breakDay);
+                    
                 }
+                
+                /*List<DateTime> breakDaysList = (List < DateTime >) ds.GetStudent(studentListCtrl.SelectedItem.ToString()).GetDateTimes();
+                CalendarDateRange calBlackoutRange = new CalendarDateRange(breakDaysList[0], breakDaysList[breakDaysList.Count-1]);
+                calCtrl.BlackoutDates.Add(calBlackoutRange);*/
             }
             
 
@@ -362,6 +372,7 @@ namespace Calendar
             }
             //TODO: skip weekends and break days
             calCtrl.SelectedDates.Clear();
+            calCtrl.CalendarDayButtonStyle = (Style)Resources["CalendarCalendarDayButtonStyle1"];
             double payedAmount = ds.GetStudent(studentName.ToString()).GetPayedAmount();
             int remainingDays = (int) Math.Floor(payedAmount / ds.GetMealPrice());
 
