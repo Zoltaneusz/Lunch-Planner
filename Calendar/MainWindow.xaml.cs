@@ -21,12 +21,19 @@ namespace Calendar
         Grid mainGrid;
         ListView studentListCtrl;
         System.Windows.Controls.Calendar calCtrl;
+        TextBox payedAmountCtrl;
+        enum EditMode {
+            None,
+            BreakDays,
+            PayedAmount
+        }
+        EditMode editMode = EditMode.None;
         
 
         public class Student
         {
             public string name;
-            public double payed;
+            public double paid;
             public DateTime payDate;
             List<DateTime> breakList = new List<DateTime>();
 
@@ -36,10 +43,10 @@ namespace Calendar
             /// <param name="name">Full name of student.</param>
             /// <param name="payed">Payed sum in HUF.</param>
             /// <param name="breakList">List of days not eating.</param>
-            public Student(string name, double payed, DateTime payDate, List<DateTime> breakList)
+            public Student(string name, double paid, DateTime payDate, List<DateTime> breakList)
             {
                 this.name = name;
-                this.payed = payed;
+                this.paid = paid;
                 this.payDate = payDate;
                 this.breakList = breakList;
             }
@@ -65,7 +72,12 @@ namespace Calendar
             }
             public double GetPayedAmount()
             {
-                return this.payed;
+                return this.paid;
+            }
+
+            public void SetPaidAmount(double paidSum)
+            {
+                this.paid = paidSum;
             }
 
             public DateTime GetPayDate()
@@ -143,6 +155,14 @@ namespace Calendar
                 if (foundStudent != null)
                 {
                     foundStudent.SetBreakList(breakList);
+                }
+            }
+            public void SetStudentPaidSum(string name, double paidSum)
+            {
+                Student? foundStudent = this.studentList.Find(x => (x.name.Equals(name)));
+                if (foundStudent != null)
+                {
+                    foundStudent.SetPaidAmount(paidSum);
                 }
             }
 
@@ -231,6 +251,7 @@ namespace Calendar
             calCtrl = (System.Windows.Controls.Calendar) sender;
             mainGrid = (Grid)calCtrl.Parent;
             studentListCtrl = (ListView)mainGrid.Children[3];
+            payedAmountCtrl = (TextBox)mainGrid.Children[8];
 
 
 
@@ -279,19 +300,35 @@ namespace Calendar
         private void breakSelectCtrl_Click(object sender, RoutedEventArgs e)
         {
             calCtrl.SelectedDates.Clear();
+            editMode = EditMode.BreakDays;
             // TODO: Clear ListView selection .
         }
 
         private void doneCtrl_Click(object sender, RoutedEventArgs e)
         {
-            SelectedDatesCollection breakList = (SelectedDatesCollection) calCtrl.SelectedDates;
-            List<DateTime> breaks = breakList.ToList();
-
             var studentName = studentListCtrl.SelectedItem;
-            if(studentName != null)
+            if (studentName == null)
             {
-                ds.SetStudentBreaks(studentName.ToString(), breaks);
+                // TODO: message to user to select student
+                return;
             }
+
+            
+            if (editMode.Equals(EditMode.BreakDays))
+            {
+                SelectedDatesCollection breakList = (SelectedDatesCollection)calCtrl.SelectedDates;
+                List<DateTime> breaks = breakList.ToList();
+
+                ds.SetStudentBreaks(studentName.ToString(), breaks);
+                
+            }
+            else if (editMode.Equals(EditMode.PayedAmount))
+            {
+                ds.SetStudentPaidSum(studentName.ToString(), Convert.ToDouble(payedAmountCtrl.Text));
+                payedAmountCtrl.Visibility = Visibility.Hidden;
+
+            }
+            
             
         }
 
@@ -303,29 +340,45 @@ namespace Calendar
             TextBox inputNameCtrl = (TextBox)mainGrid.Children[2];
             calCtrl.SelectedDates.Clear();
 
-
-            foreach (DateTime breakDay in ds.GetStudent(studentListCtrl.SelectedItem.ToString()).GetDateTimes())
+            if(studentListCtrl.SelectedItem != null)
             {
-                calCtrl.SelectedDates.Add(breakDay);
+                foreach (DateTime breakDay in ds.GetStudent(studentListCtrl.SelectedItem.ToString()).GetDateTimes())
+                {
+                    calCtrl.SelectedDates.Add(breakDay);
+                }
             }
+            
 
 
         }
 
         private void showPayedDaysCtrl_Click(object sender, RoutedEventArgs e)
         {
-
+            var studentName = studentListCtrl.SelectedItem;
+            if (studentName == null)
+            {
+                // TODO: message to user to select student
+                return;
+            }
             //TODO: skip weekends and break days
             calCtrl.SelectedDates.Clear();
-            double payedAmount = ds.GetStudent(studentListCtrl.SelectedItem.ToString()).GetPayedAmount();
+            double payedAmount = ds.GetStudent(studentName.ToString()).GetPayedAmount();
             int remainingDays = (int) Math.Floor(payedAmount / ds.GetMealPrice());
 
-            DateTime payDate = ds.GetStudent(studentListCtrl.SelectedItem.ToString()).GetPayDate();
+            DateTime payDate = ds.GetStudent(studentName.ToString()).GetPayDate();
             DateTime endDate = payDate.AddDays(remainingDays-1);
             
 
             calCtrl.SelectedDates.AddRange(payDate, endDate);
 
+        }
+
+        private void setPayedAmountCtrl_Click(object sender, RoutedEventArgs e)
+        {
+            payedAmountCtrl.Visibility = Visibility.Visible;
+            // TODO: Input filter, that only numbers are allowed.
+            editMode = EditMode.PayedAmount;
+            // TODO: Clear ListView selection .
         }
     }
 

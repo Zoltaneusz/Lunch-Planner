@@ -443,9 +443,11 @@
                 </GridView>
             </ListView.View>
         </ListView>
-        <Button Grid.Column="1" Content="Select Breaks" HorizontalAlignment="Left" Margin="192,196,0,0" VerticalAlignment="Top" Click="breakSelectCtrl_Click"/>
-        <Button Grid.Column="1" Content="Done" HorizontalAlignment="Left" Margin="320,216,0,0" VerticalAlignment="Top" Click="doneCtrl_Click"/>
+        <Button Grid.Column="1" Content="Select Breaks" HorizontalAlignment="Left" Margin="248,144,0,0" VerticalAlignment="Top" Click="breakSelectCtrl_Click"/>
+        <Button Grid.Column="1" Content="Done" HorizontalAlignment="Left" Margin="405,226,0,0" VerticalAlignment="Top" Click="doneCtrl_Click"/>
         <Button x:Name="showPayedDaysCtrl" Grid.Column="1" Content="Show Payed Dates" HorizontalAlignment="Left" Margin="10,226,0,0" VerticalAlignment="Top" Click="showPayedDaysCtrl_Click"/>
+        <Button x:Name="setPayedAmountCtrl" Grid.Column="1" Content="Set Payed Amount" HorizontalAlignment="Left" Margin="248,177,0,0" VerticalAlignment="Top" Click="setPayedAmountCtrl_Click"/>
+        <TextBox x:Name="textPayedAmountCtrl" Grid.Column="1" HorizontalAlignment="Left" Margin="248,218,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" Visibility="Hidden"/>
 
     </Grid>
 </Window>
