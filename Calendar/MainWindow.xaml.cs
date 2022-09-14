@@ -263,7 +263,7 @@ namespace Calendar
             
             // Fill Dataset
             
-            ds.AddStudent("Petike", 15000, new DateTime(2022,09,01), new List<DateTime> { new DateTime(2022, 09, 13), new DateTime(2022, 09, 18), new DateTime(2022, 09, 19) });
+            ds.AddStudent("Petike", 15000, new DateTime(2022,09,01), new List<DateTime> { new DateTime(2022, 09, 2), new DateTime(2022, 09, 6), new DateTime(2022, 09, 19) });
             ds.AddStudent("Janika", 3000, new DateTime(2022, 09, 02), new List<DateTime> { new DateTime(2022, 09, 01), new DateTime(2022, 09, 02), new DateTime(2022, 09, 03) });
             ds.AddStudent("Józsika", 9000, new DateTime(2022, 09, 03), new List<DateTime> { new DateTime(2022, 09, 10), new DateTime(2022, 09, 11), new DateTime(2022, 09, 14) });
             ds.AddStudent("Gerzsonka", 7777, new DateTime(2022, 09, 04), new List<DateTime> { new DateTime(2022, 09, 20), new DateTime(2022, 09, 21), new DateTime(2022, 09, 30) });
@@ -301,6 +301,7 @@ namespace Calendar
         private void breakSelectCtrl_Click(object sender, RoutedEventArgs e)
         {
             calCtrl.SelectedDates.Clear();
+            calCtrl.BlackoutDates.Clear();
             editMode = EditMode.BreakDays;
             // TODO: Clear ListView selection .
         }
@@ -340,6 +341,7 @@ namespace Calendar
 
             TextBox inputNameCtrl = (TextBox)mainGrid.Children[2];
             calCtrl.SelectedDates.Clear();
+            calCtrl.BlackoutDates.Clear();
             
   
             
@@ -372,15 +374,34 @@ namespace Calendar
             }
             //TODO: skip weekends and break days
             calCtrl.SelectedDates.Clear();
+            calCtrl.BlackoutDates.Clear();
             calCtrl.CalendarDayButtonStyle = (Style)Resources["CalendarCalendarDayButtonStyle1"];
             double payedAmount = ds.GetStudent(studentName.ToString()).GetPayedAmount();
             int remainingDays = (int) Math.Floor(payedAmount / ds.GetMealPrice());
 
             DateTime payDate = ds.GetStudent(studentName.ToString()).GetPayDate();
             DateTime endDate = payDate.AddDays(remainingDays-1);
-            
 
-            calCtrl.SelectedDates.AddRange(payDate, endDate);
+            // Skipping breakdays
+            DateTime startDate = payDate;
+            foreach (DateTime breakDay in ds.GetStudent(studentName.ToString()).GetDateTimes())
+            {
+                CalendarDateRange calBlackoutRange = new CalendarDateRange(breakDay, breakDay);
+                calCtrl.BlackoutDates.Add(calBlackoutRange);
+                if (breakDay < endDate)
+                {
+                    endDate = endDate.AddDays(1);
+                    calCtrl.SelectedDates.AddRange(startDate, breakDay.AddDays(-1));
+                    startDate = breakDay.AddDays(1);
+                }
+                
+            }
+            calCtrl.SelectedDates.AddRange(startDate, endDate);
+
+
+            //calCtrl.SelectedDates.AddRange(payDate, endDate);
+
+
 
         }
 
