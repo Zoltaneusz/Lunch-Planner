@@ -303,7 +303,28 @@ namespace Calendar
             calCtrl.SelectedDates.Clear();
             calCtrl.BlackoutDates.Clear();
             editMode = EditMode.BreakDays;
-            // TODO: Clear ListView selection .
+            
+
+            TextBox inputNameCtrl = (TextBox)mainGrid.Children[2];
+            calCtrl.SelectedDates.Clear();
+            calCtrl.BlackoutDates.Clear();
+
+
+
+
+            if (studentListCtrl.SelectedItem != null)
+            {
+                calCtrl.CalendarDayButtonStyle = (Style)Resources["AlternativeCalendarDayButtonStyle"];
+                foreach (DateTime breakDay in ds.GetStudent(studentListCtrl.SelectedItem.ToString()).GetDateTimes())
+                {
+                    calCtrl.SelectedDates.Add(breakDay);
+
+                }
+
+                /*List<DateTime> breakDaysList = (List < DateTime >) ds.GetStudent(studentListCtrl.SelectedItem.ToString()).GetDateTimes();
+                CalendarDateRange calBlackoutRange = new CalendarDateRange(breakDaysList[0], breakDaysList[breakDaysList.Count-1]);
+                calCtrl.BlackoutDates.Add(calBlackoutRange);*/
+            }
         }
 
         private void doneCtrl_Click(object sender, RoutedEventArgs e)
