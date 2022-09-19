@@ -5,6 +5,7 @@ using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
+using System.Runtime.ExceptionServices;
 using System.Security.Permissions;
 using System.Windows;
 using System.Windows.Controls;
@@ -66,9 +67,9 @@ namespace Calendar
                 this.paid = paid;
                 this.firstPayDate = payDate;
                 this.breakList = breakList;
-                this.paymentList.Add(new Payment(new DateTime(2022, 09, 01), 1500));
-                this.paymentList.Add(new Payment(new DateTime(2022, 09, 02), 9000));
-                this.paymentList.Add(new Payment(new DateTime(2022, 09, 10), 3000));
+                this.paymentList.Add(new Payment(new DateTime(2022, 07, 01), 30000));
+                this.paymentList.Add(new Payment(new DateTime(2022, 08, 02), 30000));
+                this.paymentList.Add(new Payment(new DateTime(2022, 09, 10), 15000));
             }
 
             public void AddBreakDay(DateTime breakDay)
@@ -236,21 +237,12 @@ namespace Calendar
 
         private void Calendar_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (e.ChangedButton == MouseButton.Left)
-            {
-                CalendarItem c = sender as CalendarItem;
-                c.FontSize = 50;
-                Debug.WriteLine(sender);
-                Debug.WriteLine(FindName("PART_HeaderButton"));
-            }
+           
         }
 
         private void Calendar_KeyUp(object sender, KeyEventArgs e)
         {
-            if (e.Key != Key.B)
-            {
-                return;
-            }
+            
      
         }
 
@@ -262,16 +254,7 @@ namespace Calendar
 
         private void Grid_MouseEnter(object sender, MouseEventArgs e)
         {
-            if (sender.GetType().Equals(typeof(Button)))
-            {
-                Button g = (Button) sender;
-                g.Visibility = Visibility.Hidden;
-            }
-            else if (sender.GetType().Equals(typeof(Grid)))
-            {
-                Grid g = (Grid) sender;
-                g.Visibility = Visibility.Hidden;
-            }
+           
             
             //Button b = g.Parent as Button;
             //ContentPresenter? cp = g.Children[0] as ContentPresenter;
@@ -445,8 +428,8 @@ namespace Calendar
             double payedAmount = ds.GetStudent(studentName.ToString()).GetPayedAmount();
             int remainingDays = (int) Math.Floor(payedAmount / ds.GetMealPrice());
 
-            DateTime payDate = ds.GetStudent(studentName.ToString()).GetFirstPayDate().payDate;
-            DateTime endDate = payDate.AddDays(remainingDays-1);
+            DateTime firstPayDate = ds.GetStudent(studentName.ToString()).GetFirstPayDate().payDate;
+            DateTime endDate = firstPayDate.AddDays(remainingDays-1);
 
             /*
             // Skipping breakdays
@@ -467,6 +450,7 @@ namespace Calendar
             */
             //calCtrl.SelectedDates.AddRange(payDate, endDate);
 
+      
             // New method
             // List breakDays
             // TODO: szombati munkanapok speckó kezelése
@@ -476,9 +460,15 @@ namespace Calendar
                 breakDayList.Add(breakDay);
 
             }
-            for(int i=0; i<remainingDays; i++)
+
+            // Calculate account for selected month
+            DateTime firstDayOfMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+
+
+            for (int i=0; i<remainingDays; i++)
             {
-                DateTime dayToHighlight = new DateTime(payDate.Year, payDate.Month, payDate.Day + i);
+                DateTime dayToHighlight = firstPayDate.AddDays(i);
+                
                 if(dayToHighlight.DayOfWeek == DayOfWeek.Sunday || dayToHighlight.DayOfWeek == DayOfWeek.Saturday) // Skip weekends
                 {
                     remainingDays++;
@@ -490,8 +480,13 @@ namespace Calendar
                         remainingDays++;
                         CalendarDateRange calBlackoutRange = new CalendarDateRange(dayToHighlight, dayToHighlight);
                         calCtrl.BlackoutDates.Add(calBlackoutRange);
+                        
                     }
-                    else calCtrl.SelectedDates.Add(dayToHighlight); // Highlight normal payed day
+                    else
+                    {
+                        calCtrl.SelectedDates.Add(dayToHighlight); // Highlight normal payed day
+                        
+                    }
                     
                 }
             }
