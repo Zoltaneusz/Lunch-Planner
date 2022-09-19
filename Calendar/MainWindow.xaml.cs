@@ -29,14 +29,23 @@ namespace Calendar
             PayedAmount
         }
         EditMode editMode = EditMode.None;
-        
+
+        public class Payment
+        {
+            public DateTime payDate;
+            public double paidAmount;
+
+        }
+
 
         public class Student
         {
             public string name;
             public double paid;
-            public DateTime payDate;
+            public DateTime firstPayDate;
             List<DateTime> breakList = new List<DateTime>();
+            List<Payment> paymentList = new List<Payment>();
+
 
             /// <summary>
             /// Constructor for Student object.
@@ -48,7 +57,7 @@ namespace Calendar
             {
                 this.name = name;
                 this.paid = paid;
-                this.payDate = payDate;
+                this.firstPayDate = payDate;
                 this.breakList = breakList;
             }
 
@@ -81,10 +90,35 @@ namespace Calendar
                 this.paid = paidSum;
             }
 
-            public DateTime GetPayDate()
+            public DateTime GetFirstPayDate()
             {
-                return this.payDate;
+                return this.firstPayDate;
             }
+            public void AddPayment(Payment payment)
+            {
+                this.paymentList.Add(payment);
+            }
+
+            public void ModifyPayment(Payment payment)
+            {
+                Payment? modifiedPayment = this.paymentList.Find(x => (x.payDate.Equals(payment.payDate)));
+                if (modifiedPayment != null)
+                {
+                    if (modifiedPayment.paidAmount.Equals(payment.paidAmount))
+                        this.paymentList.Remove(payment);
+                    else { }
+                }
+                else
+                {
+                    Debug.WriteLine("Payment not found.");
+                }
+            }
+
+            public List<Payment> GetPaymentList()
+            {
+                return this.paymentList;
+            }
+
         }
 
         public class DataSet
@@ -400,7 +434,7 @@ namespace Calendar
             double payedAmount = ds.GetStudent(studentName.ToString()).GetPayedAmount();
             int remainingDays = (int) Math.Floor(payedAmount / ds.GetMealPrice());
 
-            DateTime payDate = ds.GetStudent(studentName.ToString()).GetPayDate();
+            DateTime payDate = ds.GetStudent(studentName.ToString()).GetFirstPayDate();
             DateTime endDate = payDate.AddDays(remainingDays-1);
 
             /*
