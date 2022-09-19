@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 using System.Security.Permissions;
 using System.Windows;
 using System.Windows.Controls;
@@ -35,6 +36,11 @@ namespace Calendar
             public DateTime payDate;
             public double paidAmount;
 
+            public Payment(DateTime payDate, double paidAmount)
+            {
+                this.payDate = payDate;
+                this.paidAmount = paidAmount;
+            }
         }
 
 
@@ -45,6 +51,7 @@ namespace Calendar
             public DateTime firstPayDate;
             List<DateTime> breakList = new List<DateTime>();
             List<Payment> paymentList = new List<Payment>();
+            
 
 
             /// <summary>
@@ -59,6 +66,9 @@ namespace Calendar
                 this.paid = paid;
                 this.firstPayDate = payDate;
                 this.breakList = breakList;
+                this.paymentList.Add(new Payment(new DateTime(2022, 09, 01), 1500));
+                this.paymentList.Add(new Payment(new DateTime(2022, 09, 02), 9000));
+                this.paymentList.Add(new Payment(new DateTime(2022, 09, 10), 3000));
             }
 
             public void AddBreakDay(DateTime breakDay)
@@ -82,17 +92,18 @@ namespace Calendar
             }
             public double GetPayedAmount()
             {
-                return this.paid;
+                //return this.paid;
+                return this.paymentList.Sum(x => x.paidAmount);
             }
 
-            public void SetPaidAmount(double paidSum)
+            public void SetPaidAmount(double paidSum) //obsolete
             {
                 this.paid = paidSum;
             }
 
-            public DateTime GetFirstPayDate()
+            public Payment? GetFirstPayDate()
             {
-                return this.firstPayDate;
+                return this.paymentList.FirstOrDefault();
             }
             public void AddPayment(Payment payment)
             {
@@ -434,7 +445,7 @@ namespace Calendar
             double payedAmount = ds.GetStudent(studentName.ToString()).GetPayedAmount();
             int remainingDays = (int) Math.Floor(payedAmount / ds.GetMealPrice());
 
-            DateTime payDate = ds.GetStudent(studentName.ToString()).GetFirstPayDate();
+            DateTime payDate = ds.GetStudent(studentName.ToString()).GetFirstPayDate().payDate;
             DateTime endDate = payDate.AddDays(remainingDays-1);
 
             /*
@@ -488,13 +499,7 @@ namespace Calendar
 
         }
 
-        private void setPayedAmountCtrl_Click(object sender, RoutedEventArgs e)
-        {
-            payedAmountCtrl.Visibility = Visibility.Visible;
-            // TODO: Input filter, that only numbers are allowed.
-            editMode = EditMode.PayedAmount;
-            // TODO: Clear ListView selection .
-        }
+       
     }
 
 }
