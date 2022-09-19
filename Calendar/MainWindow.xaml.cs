@@ -12,6 +12,8 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 
+
+
 namespace Calendar
 {
     /// <summary>
@@ -25,6 +27,7 @@ namespace Calendar
         ListView studentListCtrl;
         System.Windows.Controls.Calendar calCtrl;
         TextBox payedAmountCtrl;
+        ListView payDatesListCtrl;
         enum EditMode {
             None,
             BreakDays,
@@ -34,13 +37,18 @@ namespace Calendar
 
         public class Payment
         {
-            public DateTime payDate;
-            public double paidAmount;
+            public string payDateString { get; set; }
+            public DateTime payDate { get; set; }
+            public double paidAmount { get; set; }
+            
+
 
             public Payment(DateTime payDate, double paidAmount)
             {
-                this.payDate = payDate;
+                this.payDate = payDate.Date;
                 this.paidAmount = paidAmount;
+                this.payDateString = payDate.Date.ToString("yyyy/MM/dd");
+               
             }
         }
 
@@ -281,6 +289,9 @@ namespace Calendar
             mainGrid = (Grid)calCtrl.Parent;
             studentListCtrl = (ListView)mainGrid.Children[3];
             payedAmountCtrl = (TextBox)mainGrid.Children[8];
+            payDatesListCtrl = (ListView)mainGrid.Children[9];
+
+
 
 
 
@@ -494,7 +505,32 @@ namespace Calendar
 
         }
 
-       
+        private void ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            string selectedStudent = (string)studentListCtrl.SelectedItem.ToString(); // Selected Item cannot be null;
+            List<Payment> paymentList = ds.GetStudent(selectedStudent).GetPaymentList();
+            payDatesListCtrl.Items.Clear();
+            foreach (Payment payment in paymentList)
+            {
+                payDatesListCtrl.Items.Add(payment);
+            }
+
+            var test = payDatesListCtrl.Items[2];
+
+            
+      
+
+            /*
+            this.payDatesTableCtrl.View = System.Windows.Forms
+            payDatesTableCtrl.Columns.Add("1st column", 75, HorizontalAlignment.Left);
+            foreach (Payment payment in paymentList){
+                ListViewItem item = new ListViewItem();
+                item.Subitem
+                payDatesTableCtrl.Items.Add(item);
+            }
+            */
+
+        }
     }
 
 }
