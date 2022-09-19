@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.DirectoryServices.ActiveDirectory;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 using System.Security.Permissions;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -31,9 +33,10 @@ namespace Calendar
         enum EditMode {
             None,
             BreakDays,
-            PayedAmount
+            Payment
         }
         EditMode editMode = EditMode.None;
+
 
         public class Payment
         {
@@ -212,12 +215,21 @@ namespace Calendar
                     foundStudent.SetBreakList(breakList);
                 }
             }
-            public void SetStudentPaidSum(string name, double paidSum)
+            public void SetStudentPaidSum(string name, double paidSum) // obsolete
             {
                 Student? foundStudent = this.studentList.Find(x => (x.name.Equals(name)));
                 if (foundStudent != null)
                 {
                     foundStudent.SetPaidAmount(paidSum);
+                }
+            }
+
+            public void SetStudentPayment(string name, Payment payment) // obsolete
+            {
+                Student? foundStudent = this.studentList.Find(x => (x.name.Equals(name)));
+                if (foundStudent != null)
+                {
+                    foundStudent.AddPayment(payment);
                 }
             }
 
@@ -236,10 +248,12 @@ namespace Calendar
         {
             InitializeComponent();
 
+            var culture = new CultureInfo("hu-HU");
+            Thread.CurrentThread.CurrentCulture = culture;
+            Thread.CurrentThread.CurrentUICulture = culture;
 
-            
-            
-            
+
+
 
         }
 
@@ -292,7 +306,7 @@ namespace Calendar
             payDatesListCtrl = (ListView)mainGrid.Children[9];
 
 
-
+            
 
 
             //SelectedDatesCollection selectedDates = cal.SelectedDates;
@@ -384,10 +398,18 @@ namespace Calendar
                 ds.SetStudentBreaks(studentName.ToString(), breaks);
                 
             }
-            else if (editMode.Equals(EditMode.PayedAmount))
+            else if (editMode.Equals(EditMode.Payment))
             {
+                /*
                 ds.SetStudentPaidSum(studentName.ToString(), Convert.ToDouble(payedAmountCtrl.Text));
+                 */
+
+                ds.SetStudentPayment(studentName.ToString(), new Payment(DateTime.Parse(payDateToSetCtrl.Text.ToString()), Convert.ToDouble(payedAmountCtrl.Text.ToString())));
                 payedAmountCtrl.Visibility = Visibility.Hidden;
+                payDateToSetCtrl.Visibility = Visibility.Hidden;
+
+
+
 
             }
             
@@ -530,6 +552,15 @@ namespace Calendar
             }
             */
 
+        }
+
+        private void setPaymentCtrl_Click(object sender, RoutedEventArgs e)
+        {
+            payedAmountCtrl.Visibility = Visibility.Visible;
+            payDateToSetCtrl.Visibility = Visibility.Visible;
+            editMode = EditMode.Payment;
+
+          
         }
     }
 

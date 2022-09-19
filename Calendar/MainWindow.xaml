@@ -544,7 +544,7 @@
             </Setter>
             <Setter Property="Visibility" Value="Visible"/>
         </Style>
-        
+
 
     </Window.Resources>
     <Grid KeyDown="n" Width="1002">
@@ -553,21 +553,21 @@
             <ColumnDefinition Width="249*"/>
         </Grid.ColumnDefinitions>
         <Calendar CalendarItemStyle="{DynamicResource CalendarCalendarItemStyle1}" CalendarButtonStyle="{DynamicResource CalendarCalendarButtonStyle1}" CalendarDayButtonStyle="{DynamicResource CalendarCalendarDayButtonStyle1}" Style="{DynamicResource CalendarStyle1}" IsManipulationEnabled="True" KeyUp="Calendar_KeyUp" MouseDoubleClick="Calendar_MouseDoubleClick" Grid.ColumnSpan="2" Loaded="Calendar_Loaded" HorizontalAlignment="Left" Width="766"/>
-        <Button Grid.Column="1" Content="Show Breaks" HorizontalAlignment="Left" Margin="246,112,0,0" VerticalAlignment="Top" Click="showBreaksCtrl_Click" Height="20" Width="71"/>
+        <Button Grid.Column="1" Content="Show Breaks" Margin="160,29,0,0" VerticalAlignment="Top" Click="showBreaksCtrl_Click" Height="20" HorizontalAlignment="Left"/>
         <TextBox Grid.Column="1" HorizontalAlignment="Center" Margin="0,71,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" Background="#FFF1F0F0" Visibility="Hidden" Height="18"/>
-        <ListView d:ItemsSource="{d:SampleData ItemCount=0}" Margin="41,10,546,94" Loaded="ListView_Loaded" Grid.Column="1" SelectionChanged="ListView_SelectionChanged">
+        <ListView d:ItemsSource="{d:SampleData ItemCount=0}" Margin="0,4,587,100" Loaded="ListView_Loaded" Grid.Column="1" SelectionChanged="ListView_SelectionChanged">
             <ListView.View>
                 <GridView>
                     <GridViewColumn/>
                 </GridView>
             </ListView.View>
         </ListView>
-        <Button Grid.Column="1" Content="Select Breaks" HorizontalAlignment="Left" Margin="248,144,0,0" VerticalAlignment="Top" Click="breakSelectCtrl_Click" Height="20" Width="73"/>
-        <Button Grid.Column="1" Content="Done" HorizontalAlignment="Left" Margin="275,227,0,0" VerticalAlignment="Top" Click="doneCtrl_Click" Height="20" Width="33"/>
-        <Button x:Name="showPayedDaysCtrl" Grid.Column="1" Content="Show Payed Dates" HorizontalAlignment="Left" Margin="10,226,0,0" VerticalAlignment="Top" Click="showPayedDaysCtrl_Click" Height="20" Width="101"/>
-        <Button x:Name="setPayedAmountCtrl" Grid.Column="1" Content="Set Paid Amount" HorizontalAlignment="Left" Margin="248,177,0,0" VerticalAlignment="Top" Height="20" Width="92"/>
-        <TextBox x:Name="textPayedAmountCtrl" Grid.Column="1" HorizontalAlignment="Left" Margin="248,218,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" Visibility="Hidden" Height="18"/>
-        <ListView x:Name="payDatesCtrl" Grid.Column="2" ItemsSource="{Binding payDateString}" Margin="373,10,154,104" Grid.RowSpan="5" Grid.ColumnSpan="2" Width="200" d:ItemsSource="{d:SampleData ItemCount=5}">
+        <Button Grid.Column="1" Content="Select Breaks" HorizontalAlignment="Left" Margin="485,4,0,0" VerticalAlignment="Top" Click="breakSelectCtrl_Click" Height="20" Width="73"/>
+        <Button Grid.Column="1" Content="Done" HorizontalAlignment="Left" Margin="693,236,0,0" VerticalAlignment="Top" Click="doneCtrl_Click" Height="20" Width="33"/>
+        <Button x:Name="showPayedDaysCtrl" Grid.Column="1" Content="Show Payed Dates" HorizontalAlignment="Left" Margin="160,4,0,0" VerticalAlignment="Top" Click="showPayedDaysCtrl_Click" Height="20" Width="101"/>
+        <Button x:Name="setPaymentCtrl" Grid.Column="1" Content="Set Payment" HorizontalAlignment="Left" Margin="485,39,0,0" VerticalAlignment="Top" Height="20" Width="92" Click="setPaymentCtrl_Click"/>
+        <TextBox x:Name="textPayedAmountCtrl" Grid.Column="1" HorizontalAlignment="Left" Margin="606,75,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" Visibility="Visible" Height="18" RenderTransformOrigin="0.5,0.502"/>
+        <ListView x:Name="payDatesCtrl" Grid.Column="1" ItemsSource="{Binding payDateString}" Margin="273,4,274,110" Width="200" d:ItemsSource="{d:SampleData ItemCount=5}">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Datum" 
@@ -577,6 +577,7 @@
                 </GridView>
             </ListView.View>
         </ListView>
+        <TextBox x:Name="payDateToSetCtrl" Grid.Column="1" HorizontalAlignment="Left" Margin="481,75,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" Visibility="Visible"/>
 
     </Grid>
 </Window>
