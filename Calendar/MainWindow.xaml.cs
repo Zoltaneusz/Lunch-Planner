@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.DirectoryServices.ActiveDirectory;
 using System.Globalization;
@@ -12,6 +14,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Data;
 using System.Windows.Input;
 
 
@@ -36,6 +39,10 @@ namespace Calendar
             Payment
         }
         EditMode editMode = EditMode.None;
+
+        // Variables for sorting paylist ListView
+        GridViewColumnHeader _lastHeaderClicked = null;
+        ListSortDirection _lastDirection = ListSortDirection.Ascending;
 
 
         public class Payment
@@ -251,9 +258,9 @@ namespace Calendar
             var culture = new CultureInfo("hu-HU");
             Thread.CurrentThread.CurrentCulture = culture;
             Thread.CurrentThread.CurrentUICulture = culture;
-
-
-
+            
+            
+            
 
         }
 
@@ -409,8 +416,6 @@ namespace Calendar
                 payDateToSetCtrl.Visibility = Visibility.Hidden;
 
 
-
-
             }
             
             
@@ -527,10 +532,15 @@ namespace Calendar
 
         }
 
-        private void ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void ListView_SelectionChanged(object sender, SelectionChangedEventArgs e) // List payments of selected student
         {
             string selectedStudent = (string)studentListCtrl.SelectedItem.ToString(); // Selected Item cannot be null;
             List<Payment> paymentList = ds.GetStudent(selectedStudent).GetPaymentList();
+
+            payDatesListCtrl.ItemsSource = paymentList;
+
+            
+            /*
             payDatesListCtrl.Items.Clear();
             foreach (Payment payment in paymentList)
             {
@@ -538,7 +548,7 @@ namespace Calendar
             }
 
             var test = payDatesListCtrl.Items[2];
-
+            */
             
       
 
@@ -561,6 +571,77 @@ namespace Calendar
             editMode = EditMode.Payment;
 
           
+        }
+
+        private void payDatesCtrl_Loaded(object sender, RoutedEventArgs e)
+        {
+            //ListCollectionView view = (ListCollectionView)CollectionViewSource.GetDefaultView(payDatesListCtrl.ItemsSource);
+
+        }
+
+        private void Sort(string sortBy, ListSortDirection direction)
+        {
+            ICollectionView dataView =
+              CollectionViewSource.GetDefaultView(payDatesListCtrl.ItemsSource);
+
+            dataView.SortDescriptions.Clear();
+            SortDescription sd = new SortDescription(sortBy, direction);
+            dataView.SortDescriptions.Add(sd);
+            dataView.Refresh();
+        }
+
+        void payDatesCtrlColumnHeaderClicked(object sender,
+                                            RoutedEventArgs e)
+        {
+            var headerClicked = e.OriginalSource as GridViewColumnHeader;
+            ListSortDirection direction;
+
+            if (headerClicked != null)
+            {
+                if (headerClicked.Role != GridViewColumnHeaderRole.Padding)
+                {
+                    if (headerClicked != _lastHeaderClicked)
+                    {
+                        direction = ListSortDirection.Ascending;
+                    }
+                    else
+                    {
+                        if (_lastDirection == ListSortDirection.Ascending)
+                        {
+                            direction = ListSortDirection.Descending;
+                        }
+                        else
+                        {
+                            direction = ListSortDirection.Ascending;
+                        }
+                    }
+
+                    var columnBinding = headerClicked.Column.DisplayMemberBinding as Binding;
+                    var sortBy = columnBinding?.Path.Path ?? headerClicked.Column.Header as string;
+
+                    Sort(sortBy, direction);
+
+                    if (direction == ListSortDirection.Ascending)
+                    {
+                        headerClicked.Column.HeaderTemplate =
+                          Resources["HeaderTemplateArrowUp"] as DataTemplate;
+                    }
+                    else
+                    {
+                        headerClicked.Column.HeaderTemplate =
+                          Resources["HeaderTemplateArrowDown"] as DataTemplate;
+                    }
+
+                    // Remove arrow from previously sorted header
+                    if (_lastHeaderClicked != null && _lastHeaderClicked != headerClicked)
+                    {
+                        _lastHeaderClicked.Column.HeaderTemplate = null;
+                    }
+
+                    _lastHeaderClicked = headerClicked;
+                    _lastDirection = direction;
+                }
+            }
         }
     }
 

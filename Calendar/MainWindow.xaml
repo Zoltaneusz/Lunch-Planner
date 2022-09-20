@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Calendar"
         mc:Ignorable="d"
+        xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"  
         Title="MainWindow" Height="Auto" Width="Auto">
     <Window.Resources>
         <Style x:Key="CalendarStyle1" TargetType="{x:Type Calendar}">
@@ -544,7 +545,7 @@
             </Setter>
             <Setter Property="Visibility" Value="Visible"/>
         </Style>
-
+   
 
     </Window.Resources>
     <Grid KeyDown="n" Width="1002">
@@ -567,7 +568,7 @@
         <Button x:Name="showPayedDaysCtrl" Grid.Column="1" Content="Show Payed Dates" HorizontalAlignment="Left" Margin="160,4,0,0" VerticalAlignment="Top" Click="showPayedDaysCtrl_Click" Height="20" Width="101"/>
         <Button x:Name="setPaymentCtrl" Grid.Column="1" Content="Set Payment" HorizontalAlignment="Left" Margin="485,39,0,0" VerticalAlignment="Top" Height="20" Width="92" Click="setPaymentCtrl_Click"/>
         <TextBox x:Name="textPayedAmountCtrl" Grid.Column="1" HorizontalAlignment="Left" Margin="606,75,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" Visibility="Visible" Height="18" RenderTransformOrigin="0.5,0.502"/>
-        <ListView x:Name="payDatesCtrl" Grid.Column="1" ItemsSource="{Binding payDateString}" Margin="273,4,274,110" Width="200" d:ItemsSource="{d:SampleData ItemCount=5}">
+        <ListView x:Name="payDatesCtrl" Grid.Column="1" ItemsSource="{Binding PaymentDataCollection}" Margin="273,4,274,110" Width="200" VirtualizingStackPanel.IsVirtualizing="True" Loaded="payDatesCtrl_Loaded"  GridViewColumnHeader.Click="payDatesCtrlColumnHeaderClicked" >
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Datum" 
