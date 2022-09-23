@@ -37,7 +37,8 @@ namespace Calendar
             None,
             BreakDays,
             AddPayment,
-            ModifyPayment
+            ModifyPayment,
+            DeletePayment
         }
         EditMode editMode = EditMode.None;
 
@@ -139,6 +140,23 @@ namespace Calendar
                     {
                         this.paymentList.Remove(originalPayment);
                         this.paymentList.Add(newPayment);
+                    }
+                    else { }
+                }
+                else
+                {
+                    Debug.WriteLine("Payment not found.");
+                }
+            }
+            public void DeletePayment(Payment payment)
+            {
+                Payment? modifiedPayment = this.paymentList.Find(x => (x.payDate.Equals(payment.payDate)));
+                if (modifiedPayment != null)
+                {
+                    if (modifiedPayment.paidAmount.Equals(payment.paidAmount))
+                    {
+                        this.paymentList.Remove(payment);
+                        
                     }
                     else { }
                 }
@@ -250,6 +268,15 @@ namespace Calendar
                 if (foundStudent != null)
                 {
                     foundStudent.ModifyPayment(oldPayment, newPayment);
+                }
+            }
+
+            public void DeleteStudentPayment(string name, Payment payment)
+            {
+                Student? foundStudent = this.studentList.Find(x => (x.name.Equals(name)));
+                if (foundStudent != null)
+                {
+                    foundStudent.DeletePayment(payment);
                 }
             }
 
@@ -440,6 +467,14 @@ namespace Calendar
 
                 payedAmountCtrl.Visibility = Visibility.Hidden;
                 payDateToSetCtrl.Visibility = Visibility.Hidden;
+                RefreshDates();
+            }
+            else if (editMode.Equals(EditMode.DeletePayment))
+            {
+                Payment paymentToDelete = (Payment)payDatesCtrl.SelectedItem;
+                ds.DeleteStudentPayment(studentName.ToString(), paymentToDelete);
+
+                payDatesCtrl.ItemContainerStyle = (Style)this.FindResource("dateHighlightStyleNormal");
                 RefreshDates();
             }
             
@@ -693,6 +728,12 @@ namespace Calendar
 
 
             editMode = EditMode.ModifyPayment;
+        }
+
+        private void deletePaymentCtrl_Click(object sender, RoutedEventArgs e)
+        {
+            editMode = EditMode.DeletePayment;
+            payDatesCtrl.ItemContainerStyle = (Style)this.FindResource("dateHighlightStyleDelete");
         }
     }
 

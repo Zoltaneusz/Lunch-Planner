@@ -545,15 +545,42 @@
             </Setter>
             <Setter Property="Visibility" Value="Visible"/>
         </Style>
-   
+        <Style x:Key="dateHighlightStyleNormal" TargetType="{x:Type ListViewItem}">
+            <Style.Resources>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}"
+                             Color="purple"/>
+            </Style.Resources>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True" >
+                    <Setter Property="FontWeight" Value="Bold" />
+                    <Setter Property="Background" Value="blue" />
+                    <Setter Property="Foreground" Value="white" />
+                </Trigger>
+            </Style.Triggers>
+
+        </Style>
+        <Style x:Key="dateHighlightStyleDelete" TargetType="{x:Type ListViewItem}">
+            <Style.Resources>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}"
+                             Color="purple"/>
+            </Style.Resources>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True" >
+                    <Setter Property="FontWeight" Value="Bold" />
+                    <Setter Property="Background" Value="red" />
+                    <Setter Property="Foreground" Value="white" />
+                </Trigger>
+            </Style.Triggers>
+
+        </Style>
 
     </Window.Resources>
-    <Grid KeyDown="n" Width="1002">
+    <Grid KeyDown="n" Width="1002" Height="265">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="85*"/>
             <ColumnDefinition Width="249*"/>
         </Grid.ColumnDefinitions>
-        <Calendar CalendarItemStyle="{DynamicResource CalendarCalendarItemStyle1}" CalendarButtonStyle="{DynamicResource CalendarCalendarButtonStyle1}" CalendarDayButtonStyle="{DynamicResource CalendarCalendarDayButtonStyle1}" Style="{DynamicResource CalendarStyle1}" IsManipulationEnabled="True" KeyUp="Calendar_KeyUp" MouseDoubleClick="Calendar_MouseDoubleClick" Grid.ColumnSpan="2" Loaded="Calendar_Loaded" HorizontalAlignment="Left" Width="766"/>
+        <Calendar CalendarItemStyle="{DynamicResource CalendarCalendarItemStyle1}" CalendarButtonStyle="{DynamicResource CalendarCalendarButtonStyle1}" CalendarDayButtonStyle="{DynamicResource CalendarCalendarDayButtonStyle1}" Style="{DynamicResource CalendarStyle1}" IsManipulationEnabled="True" KeyUp="Calendar_KeyUp" MouseDoubleClick="Calendar_MouseDoubleClick" Loaded="Calendar_Loaded" HorizontalAlignment="Center" Width="255"/>
         <Button Grid.Column="1" Content="Show Breaks" Margin="160,29,0,0" VerticalAlignment="Top" Click="showBreaksCtrl_Click" Height="20" HorizontalAlignment="Left"/>
         <TextBox Grid.Column="1" HorizontalAlignment="Center" Margin="0,71,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" Background="#FFF1F0F0" Visibility="Hidden" Height="18"/>
         <ListView d:ItemsSource="{d:SampleData ItemCount=0}" Margin="0,4,587,100" Loaded="ListView_Loaded" Grid.Column="1" SelectionChanged="ListView_SelectionChanged">
@@ -563,12 +590,12 @@
                 </GridView>
             </ListView.View>
         </ListView>
-        <Button Grid.Column="1" Content="Select Breaks" HorizontalAlignment="Left" Margin="485,4,0,0" VerticalAlignment="Top" Click="breakSelectCtrl_Click" Height="20" Width="73"/>
-        <Button Grid.Column="1" Content="Done" HorizontalAlignment="Left" Margin="693,236,0,0" VerticalAlignment="Top" Click="doneCtrl_Click" Height="20" Width="33"/>
+        <Button Grid.Column="1" Content="Select Breaks" HorizontalAlignment="Left" Margin="160,54,0,0" VerticalAlignment="Top" Click="breakSelectCtrl_Click" Height="20" Width="73"/>
+        <Button Grid.Column="1" Content="Done" HorizontalAlignment="Center" Margin="704,236,0,0" VerticalAlignment="Center" Click="doneCtrl_Click" Height="20" Width="33"/>
         <Button x:Name="showPayedDaysCtrl" Grid.Column="1" Content="Show Payed Dates" HorizontalAlignment="Left" Margin="160,4,0,0" VerticalAlignment="Top" Click="showPayedDaysCtrl_Click" Height="20" Width="101"/>
-        <Button x:Name="addPaymentCtrl" Grid.Column="1" Content="Add Payment" HorizontalAlignment="Left" Margin="485,39,0,0" VerticalAlignment="Top" Height="20" Width="92" Click="addPaymentCtrl_Click"/>
-        <TextBox x:Name="textPayedAmountCtrl" Grid.Column="1" HorizontalAlignment="Left" Margin="606,75,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" Visibility="Visible" Height="18" RenderTransformOrigin="0.5,0.502"/>
-        <ListView x:Name="payDatesCtrl" Grid.Column="1" ItemsSource="{Binding PaymentDataCollection}" Margin="273,4,274,110" Width="200" VirtualizingStackPanel.IsVirtualizing="True" Loaded="payDatesCtrl_Loaded"  GridViewColumnHeader.Click="payDatesCtrlColumnHeaderClicked" >
+        <Button x:Name="addPaymentCtrl" Grid.Column="1" Content="Add Payment" HorizontalAlignment="Left" Margin="478,3,0,0" VerticalAlignment="Top" Height="20" Width="92" Click="addPaymentCtrl_Click"/>
+        <TextBox x:Name="textPayedAmountCtrl" Grid.Column="1" HorizontalAlignment="Left" Margin="378,164,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="95" Visibility="Visible" Height="18" RenderTransformOrigin="0.5,0.502"/>
+        <ListView x:Name="payDatesCtrl" Grid.Column="1" ItemsSource="{Binding PaymentDataCollection}" Width="200" VirtualizingStackPanel.IsVirtualizing="True" Loaded="payDatesCtrl_Loaded"  GridViewColumnHeader.Click="payDatesCtrlColumnHeaderClicked" ItemContainerStyle="{StaticResource dateHighlightStyleNormal}" Height="160" Margin="273,0,274,104">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Datum" 
@@ -578,8 +605,9 @@
                 </GridView>
             </ListView.View>
         </ListView>
-        <TextBox x:Name="payDateToSetCtrl" Grid.Column="1" HorizontalAlignment="Left" Margin="481,75,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" Visibility="Visible"/>
-        <Button x:Name="editPaymentCtrl" Grid.Column="1" Content="Edit Payment" HorizontalAlignment="Left" Margin="606,39,0,0" VerticalAlignment="Top" Click="editPaymentCtrl_Click"/>
+        <TextBox x:Name="payDateToSetCtrl" Grid.Column="1" HorizontalAlignment="Left" Margin="273,164,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="100" Visibility="Visible"/>
+        <Button x:Name="editPaymentCtrl" Grid.Column="1" Content="Edit Payment" HorizontalAlignment="Left" Margin="478,29,0,0" VerticalAlignment="Top" Click="editPaymentCtrl_Click" Width="92"/>
+        <Button x:Name="deletePaymentCtrl" Grid.Column="1" Content="Delete Payment" HorizontalAlignment="Left" Margin="478,54,0,0" VerticalAlignment="Top" Width="92" Click="deletePaymentCtrl_Click"/>
 
     </Grid>
 </Window>
