@@ -36,7 +36,8 @@ namespace Calendar
         enum EditMode {
             None,
             BreakDays,
-            Payment
+            AddPayment,
+            ModifyPayment
         }
         EditMode editMode = EditMode.None;
 
@@ -129,13 +130,16 @@ namespace Calendar
                 this.paymentList.Add(payment);
             }
 
-            public void ModifyPayment(Payment payment)
+            public void ModifyPayment(Payment originalPayment, Payment newPayment)
             {
-                Payment? modifiedPayment = this.paymentList.Find(x => (x.payDate.Equals(payment.payDate)));
+                Payment? modifiedPayment = this.paymentList.Find(x => (x.payDate.Equals(originalPayment.payDate)));
                 if (modifiedPayment != null)
                 {
-                    if (modifiedPayment.paidAmount.Equals(payment.paidAmount))
-                        this.paymentList.Remove(payment);
+                    if (modifiedPayment.paidAmount.Equals(originalPayment.paidAmount))
+                    {
+                        this.paymentList.Remove(originalPayment);
+                        this.paymentList.Add(newPayment);
+                    }
                     else { }
                 }
                 else
@@ -231,12 +235,21 @@ namespace Calendar
                 }
             }
 
-            public void SetStudentPayment(string name, Payment payment) // obsolete
+            public void AddStudentPayment(string name, Payment payment) 
             {
                 Student? foundStudent = this.studentList.Find(x => (x.name.Equals(name)));
                 if (foundStudent != null)
                 {
                     foundStudent.AddPayment(payment);
+                }
+            }
+
+            public void ModifyStudentPayment(string name, Payment oldPayment, Payment newPayment)
+            {
+                Student? foundStudent = this.studentList.Find(x => (x.name.Equals(name)));
+                if (foundStudent != null)
+                {
+                    foundStudent.ModifyPayment(oldPayment, newPayment);
                 }
             }
 
@@ -405,17 +418,29 @@ namespace Calendar
                 ds.SetStudentBreaks(studentName.ToString(), breaks);
                 
             }
-            else if (editMode.Equals(EditMode.Payment))
+            else if (editMode.Equals(EditMode.AddPayment))
             {
                 /*
                 ds.SetStudentPaidSum(studentName.ToString(), Convert.ToDouble(payedAmountCtrl.Text));
                  */
 
-                ds.SetStudentPayment(studentName.ToString(), new Payment(DateTime.Parse(payDateToSetCtrl.Text.ToString()), Convert.ToDouble(payedAmountCtrl.Text.ToString())));
+                ds.AddStudentPayment(studentName.ToString(), new Payment(DateTime.Parse(payDateToSetCtrl.Text.ToString()), Convert.ToDouble(payedAmountCtrl.Text.ToString())));
                 payedAmountCtrl.Visibility = Visibility.Hidden;
                 payDateToSetCtrl.Visibility = Visibility.Hidden;
+                RefreshDates();
 
 
+            }
+            else if (editMode.Equals(EditMode.ModifyPayment))
+            {
+                Payment newPayment = new Payment(DateTime.Parse(payDateToSetCtrl.Text.ToString()), Convert.ToDouble(payedAmountCtrl.Text.ToString()));
+                Payment oldPayment = (Payment) payDatesCtrl.SelectedItem;
+
+                ds.ModifyStudentPayment(studentName.ToString(), oldPayment, newPayment);
+
+                payedAmountCtrl.Visibility = Visibility.Hidden;
+                payDateToSetCtrl.Visibility = Visibility.Hidden;
+                RefreshDates();
             }
             
             
@@ -564,11 +589,13 @@ namespace Calendar
 
         }
 
-        private void setPaymentCtrl_Click(object sender, RoutedEventArgs e)
+        private void addPaymentCtrl_Click(object sender, RoutedEventArgs e)
         {
             payedAmountCtrl.Visibility = Visibility.Visible;
             payDateToSetCtrl.Visibility = Visibility.Visible;
-            editMode = EditMode.Payment;
+            payedAmountCtrl.Clear();
+            payDateToSetCtrl.Clear();
+            editMode = EditMode.AddPayment;
 
           
         }
@@ -577,6 +604,13 @@ namespace Calendar
         {
             //ListCollectionView view = (ListCollectionView)CollectionViewSource.GetDefaultView(payDatesListCtrl.ItemsSource);
 
+        }
+
+        private void RefreshDates()
+        {
+            ICollectionView dataView =
+              CollectionViewSource.GetDefaultView(payDatesListCtrl.ItemsSource);
+            dataView.Refresh();
         }
 
         private void Sort(string sortBy, ListSortDirection direction)
@@ -642,6 +676,23 @@ namespace Calendar
                     _lastDirection = direction;
                 }
             }
+        }
+
+        private void editPaymentCtrl_Click(object sender, RoutedEventArgs e)
+        {
+            payedAmountCtrl.Visibility = Visibility.Visible;
+            payDateToSetCtrl.Visibility = Visibility.Visible;
+            
+            Payment? selectedPayment = (Payment)payDatesCtrl.SelectedItem;
+            if(selectedPayment != null)
+            {
+                payedAmountCtrl.Text = selectedPayment.paidAmount.ToString();
+                payDateToSetCtrl.Text = selectedPayment.payDateString;
+
+            }
+
+
+            editMode = EditMode.ModifyPayment;
         }
     }
 
